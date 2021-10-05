@@ -2,19 +2,22 @@ package main
 
 import (
 	"fmt"
+	"github.com/gofiber/fiber/v2"
 	"log"
 	"net/http"
 	"time"
+	"todo-togo/controller"
 	"todo-togo/db"
 	"todo-togo/entity"
 	"todo-togo/repository"
+	"todo-togo/service"
 )
 
 func greet(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "Hello Final Task! %s", time.Now())
 }
 
-func main() {
+func oldmain() {
 	//http.HandleFunc("/", greet)
 	//http.ListenAndServe(":8088", nil)
 
@@ -78,4 +81,22 @@ func main() {
 		UserID: 1,
 	})
 	log.Println(u)
+}
+
+func main() {
+	app := fiber.New()
+
+	dbConn := db.NewSqliteConnection()
+
+	todoRepo := repository.NewTodoRepo(dbConn)
+	todoService := service.NewTodoService(&todoRepo)
+	todoController := controller.NewController(&todoService)
+
+	statusRepo := repository.NewStatusRepo(dbConn)
+	statusService := service.NewStatusService(&statusRepo)
+	statusService.PrepareAllStatus()
+
+	todoController.Route(app)
+
+	log.Fatal(app.Listen(":8088"))
 }

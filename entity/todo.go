@@ -1,15 +1,5 @@
 package entity
 
-import "time"
-
-type TodoDisplay struct {
-	Title       string
-	Description string
-	DueDate     time.Time
-	PIC         string
-	Status      string
-}
-
 type Todo struct {
 	ID          int    `db:"id"`
 	Title       string `db:"title"`

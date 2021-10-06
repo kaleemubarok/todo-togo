@@ -1,0 +1,368 @@
+basePath: /
+definitions:
+  model.CreateTodoRequest:
+    properties:
+      description:
+        example: Clean all leftover comment and unnecessary code
+        type: string
+      due_date:
+        example: "2021-12-30"
+        type: string
+      id:
+        type: integer
+      pic:
+        example: 2
+        type: integer
+      status:
+        example: 1
+        type: integer
+      title:
+        example: Clean up source code
+        type: string
+    type: object
+  model.CreateTodoResponse:
+    properties:
+      description:
+        example: Clean all leftover comment and unnecessary code
+        type: string
+      due_date:
+        example: "2021-12-30"
+        type: string
+      id:
+        example: 1
+        type: integer
+      pic:
+        example: Bambang Prstoyo
+        type: string
+      status:
+        example: New
+        type: string
+      title:
+        example: Clean up source code
+        type: string
+    type: object
+  model.JsonBadRequestErrorReturn:
+    properties:
+      error:
+        example: Error to parse updated todos
+        type: string
+      status:
+        example: false
+        type: boolean
+    type: object
+  model.JsonDeleteTodosReturn:
+    properties:
+      status:
+        example: true
+        type: boolean
+      todos:
+        example: nil
+        type: string
+    type: object
+  model.JsonDeleteUserReturn:
+    properties:
+      status:
+        example: true
+        type: boolean
+      user:
+        type: string
+    type: object
+  model.JsonInternalErrorReturn:
+    properties:
+      error:
+        example: Error to get all todos
+        type: string
+      status:
+        example: false
+        type: boolean
+    type: object
+  model.JsonSuccessLoginReturn:
+    properties:
+      status:
+        example: true
+        type: boolean
+      token:
+        example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2MzM3MzEwMzQsInVzZXJfaWQiOjQsInVzZXJfbmFtZSI6Ikpva28gQW51YXIzIn0.16vwI9kQQj7ER4yEoZDUezm-il3YZdBYr_XAoasWoj0
+        type: string
+    type: object
+  model.JsonSuccessTodosReturn:
+    properties:
+      status:
+        example: true
+        type: boolean
+      todos:
+        items:
+          $ref: '#/definitions/model.CreateTodoResponse'
+        type: array
+    type: object
+  model.JsonSuccessUserReturn:
+    properties:
+      status:
+        example: true
+        type: boolean
+      user:
+        items:
+          $ref: '#/definitions/model.UserReqResponse'
+        type: array
+    type: object
+  model.LoginInput:
+    properties:
+      email:
+        example: badu.naik.gajah@gmail.com
+        type: string
+      password:
+        example: rahasiaIbuBADU
+        type: string
+    type: object
+  model.UserReqResponse:
+    properties:
+      email:
+        example: surat@mail.com
+        type: string
+      id:
+        type: integer
+      name:
+        example: Ibu Badu
+        type: string
+      password:
+        example: password123
+        type: string
+      salt:
+        type: string
+    type: object
+host: localhost:8088
+info:
+  contact: {}
+  description: This is an auto-generated API Docs.
+  title: TODO-TOGO a Todo API
+  version: "1.0"
+paths:
+  /todo:
+    get:
+      consumes:
+      - application/json
+      description: Get all todo list without any params required
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.JsonSuccessTodosReturn'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/model.JsonBadRequestErrorReturn'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.JsonInternalErrorReturn'
+      summary: Get all todos list
+      tags:
+      - Todo
+    post:
+      consumes:
+      - application/json
+      description: Add new single todo task
+      parameters:
+      - description: Add todo
+        in: body
+        name: Task
+        required: true
+        schema:
+          $ref: '#/definitions/model.CreateTodoRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.JsonSuccessTodosReturn'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/model.JsonBadRequestErrorReturn'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.JsonInternalErrorReturn'
+      summary: Add new single todo task
+      tags:
+      - Todo
+    put:
+      consumes:
+      - application/json
+      description: Update todo task
+      parameters:
+      - description: Modify todo
+        in: body
+        name: Task
+        required: true
+        schema:
+          $ref: '#/definitions/model.CreateTodoRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.JsonSuccessTodosReturn'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/model.JsonBadRequestErrorReturn'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.JsonInternalErrorReturn'
+      summary: Update todo task
+      tags:
+      - Todo
+  /todo/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a todo task by task ID
+      parameters:
+      - description: Task ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.JsonDeleteTodosReturn'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/model.JsonBadRequestErrorReturn'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.JsonInternalErrorReturn'
+      summary: Delete a todo task
+      tags:
+      - Todo
+  /user:
+    post:
+      consumes:
+      - application/json
+      description: Add new user, "salt" and "id" should be empty
+      parameters:
+      - description: User details
+        in: body
+        name: NewUser
+        required: true
+        schema:
+          $ref: '#/definitions/model.UserReqResponse'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.JsonSuccessUserReturn'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/model.JsonBadRequestErrorReturn'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.JsonInternalErrorReturn'
+      summary: Add new user
+      tags:
+      - User
+    put:
+      consumes:
+      - application/json
+      description: Update user data, "salt" should be empty
+      parameters:
+      - description: User details
+        in: body
+        name: User
+        required: true
+        schema:
+          $ref: '#/definitions/model.UserReqResponse'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.JsonSuccessUserReturn'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/model.JsonBadRequestErrorReturn'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.JsonInternalErrorReturn'
+      summary: Update user data
+      tags:
+      - User
+  /user/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete user data
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.JsonDeleteUserReturn'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/model.JsonBadRequestErrorReturn'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.JsonInternalErrorReturn'
+      summary: Delete user data
+      tags:
+      - User
+  /user/login:
+    post:
+      consumes:
+      - application/json
+      description: Get token for authentication header [NOT IMPLEMENTED]
+      parameters:
+      - description: Login details
+        in: body
+        name: Login
+        required: true
+        schema:
+          $ref: '#/definitions/model.LoginInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.JsonSuccessLoginReturn'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/model.JsonBadRequestErrorReturn'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.JsonInternalErrorReturn'
+      summary: Get login token
+      tags:
+      - User
+swagger: "2.0"

@@ -14,3 +14,12 @@ func NewSqliteConnection() *sqlx.DB {
 
 	return db
 }
+
+func NewSqliteConnectionTest() *sqlx.DB {
+	db, err := sqlx.Connect("sqlite3", "./db/todotogo_test.db")
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	return db
+}

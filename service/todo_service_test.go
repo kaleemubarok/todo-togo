@@ -50,10 +50,9 @@ func Test_todoService_AddTodo(t *testing.T) {
 		FillAllStatDummy()
 
 		//mockTodoService.On("SelectAllStatus").Return(mockListSuccessStatus, nil)
-		mockTodoService.On("CreateTodo", prepareTodo).Return(&entity.Todo{}, nil)
+		mockTodoService.On("CreateTodo", prepareTodo).Return(&entity.Todo{}, nil).Once()
 		u := NewTodoService(mockTodoService)
-		u.AddTodo(mockNewTodo)
-		res, err := mockTodoService.CreateTodo(prepareTodo)
+		res, err := u.AddTodo(mockNewTodo)
 
 		assert.Nil(t, err)
 		assert.NotNil(t, res)
@@ -65,10 +64,9 @@ func Test_todoService_AddTodo(t *testing.T) {
 		FillAllStatDummy()
 
 		//mockTodoService.On("SelectAllStatus").Return(mockListSuccessStatus, nil)
-		mockTodoService.On("CreateTodo", entity.Todo{}).Return(nil, errors.New("error returned"))
+		mockTodoService.On("CreateTodo", entity.Todo{}).Return(nil, errors.New("error returned")).Once()
 		u := NewTodoService(mockTodoService)
-		u.AddTodo(model.CreateTodoRequest{})
-		res, err := mockTodoService.CreateTodo(entity.Todo{})
+		res, err := u.AddTodo(model.CreateTodoRequest{})
 
 		assert.Nil(t, res)
 		assert.NotNil(t, err)
@@ -125,76 +123,133 @@ func Test_todoService_DeleteTodo(t *testing.T) {
 
 }
 
-//func Test_todoService_GetAllTodo(t1 *testing.T) {
-//	type fields struct {
-//		todo   repository.ITodoRepo
-//		status repository.IStatusRepo
-//		user   repository.IStatusRepo
-//	}
-//	tests := []struct {
-//		name    string
-//		fields  fields
-//		want    []*model.CreateTodoResponse
-//		wantErr bool
-//	}{
-//		// TODO: Add test cases.
-//	}
-//	for _, tt := range tests {
-//		t1.Run(tt.name, func(t1 *testing.T) {
-//			t := todoService{
-//				todo:   tt.fields.todo,
-//				status: tt.fields.status,
-//				user:   tt.fields.user,
-//			}
-//			got, err := t.GetAllTodo()
-//			if (err != nil) != tt.wantErr {
-//				t1.Errorf("GetAllTodo() error = %v, wantErr %v", err, tt.wantErr)
-//				return
-//			}
-//			if !reflect.DeepEqual(got, tt.want) {
-//				t1.Errorf("GetAllTodo() got = %v, want %v", got, tt.want)
-//			}
-//		})
-//	}
-//}
-//
-//func Test_todoService_GetTodo(t1 *testing.T) {
-//	type fields struct {
-//		todo   repository.ITodoRepo
-//		status repository.IStatusRepo
-//		user   repository.IStatusRepo
-//	}
-//	type args struct {
-//		todo model.CreateTodoRequest
-//	}
-//	tests := []struct {
-//		name    string
-//		fields  fields
-//		args    args
-//		want    *model.CreateTodoResponse
-//		wantErr bool
-//	}{
-//		// TODO: Add test cases.
-//	}
-//	for _, tt := range tests {
-//		t1.Run(tt.name, func(t1 *testing.T) {
-//			t := todoService{
-//				todo:   tt.fields.todo,
-//				status: tt.fields.status,
-//				user:   tt.fields.user,
-//			}
-//			got, err := t.GetTodo(tt.args.todo)
-//			if (err != nil) != tt.wantErr {
-//				t1.Errorf("GetTodo() error = %v, wantErr %v", err, tt.wantErr)
-//				return
-//			}
-//			if !reflect.DeepEqual(got, tt.want) {
-//				t1.Errorf("GetTodo() got = %v, want %v", got, tt.want)
-//			}
-//		})
-//	}
-//}
+func Test_todoService_GetAllTodo(t *testing.T) {
+	mockTodoService := new(mocks.ITodoRepo)
+
+	t.Run("error-select", func(t *testing.T) {
+
+		mockTodoService.On("SelectAllTodo").Return(nil, errors.New("error on selectTodo")).Once()
+		u := NewTodoService(mockTodoService)
+		_, err := u.GetAllTodo()
+
+		assert.NotNil(t, err)
+		mockTodoService.AssertExpectations(t)
+	})
+
+	t.Run("success", func(t *testing.T) {
+		var todos = []*entity.Todo{
+			{ID: 1, Title: "1", Description: "1", DueDate: "2020-10-10", PIC: 1, PICName: "1", Status: 1, StatusDesc: "New"},
+			{ID: 2, Title: "2", Description: "2", DueDate: "2020-10-10", PIC: 2, PICName: "2", Status: 2, StatusDesc: "OnGoing"},
+		}
+		mockTodoService.On("SelectAllTodo").Return(todos, nil).Once()
+		u := NewTodoService(mockTodoService)
+		res, err := u.GetAllTodo()
+
+		assert.Nil(t, err)
+		assert.NotNil(t, res)
+
+		mockTodoService.AssertExpectations(t)
+	})
+}
+
+func Test_todoService_GetTodo(t *testing.T) {
+	mockTodoService := new(mocks.ITodoRepo)
+	var mockRequestedID model.CreateTodoRequest
+
+	mockRequestedID =model.CreateTodoRequest{ID: 1}
+
+	requestedID := entity.Todo{ID: mockRequestedID.ID}
+
+	t.Run("error-select", func(t *testing.T) {
+
+		mockTodoService.On("SelectTodo", requestedID).Return(nil, errors.New("error on selectTodo")).Once()
+		u := NewTodoService(mockTodoService)
+		_, err := u.GetTodo(mockRequestedID)
+
+		assert.NotNil(t, err)
+		mockTodoService.AssertExpectations(t)
+	})
+
+	t.Run("success", func(t *testing.T) {
+		mockTodoService.On("SelectTodo", requestedID).Return(&entity.Todo{}, nil).Once()
+		u := NewTodoService(mockTodoService)
+		res, err := u.GetTodo(mockRequestedID)
+
+		assert.Nil(t, err)
+		assert.NotNil(t, res)
+
+		mockTodoService.AssertExpectations(t)
+	})
+}
 
 func Test_todoService_ModifyTodo(t *testing.T) {
+	mockTodoService := new(mocks.ITodoRepo)
+	var mockModifyTodo model.CreateTodoRequest
 
+	mockModifyTodo =model.CreateTodoRequest{
+		Title:       "New Todo",
+		Description: "New Desc",
+		DueDate:     "2021-10-20",
+		PIC:         1,
+		Status:      1,
+	}
+
+	modifiedTodo := entity.Todo{
+		Title:       mockModifyTodo.Title,
+		Description: mockModifyTodo.Description,
+		DueDate:     mockModifyTodo.DueDate,
+		PIC:         mockModifyTodo.PIC,
+		Status:      mockModifyTodo.Status,
+	}
+
+	t.Run("map-empty", func(t *testing.T) {
+		ResetAllStatDummy()
+		NewTodoService(mockTodoService)
+		u := NewTodoService(mockTodoService)
+		res,err:=u.ModifyTodo(mockModifyTodo)
+
+		assert.Nil(t, res)
+		assert.Error(t, err)
+		mockTodoService.AssertExpectations(t)
+	})
+
+	t.Run("error-select", func(t *testing.T) {
+		FillAllStatDummy()
+
+		mockTodoService.On("SelectTodo", modifiedTodo).Return(nil, errors.New("error on selectTodo")).Once()
+		u := NewTodoService(mockTodoService)
+		_, err := u.ModifyTodo(mockModifyTodo)
+
+		assert.NotNil(t, err)
+
+		mockTodoService.AssertExpectations(t)
+	})
+
+	t.Run("success", func(t *testing.T) {
+		FillAllStatDummy()
+
+		mockTodoService.On("SelectTodo", modifiedTodo).Return(&entity.Todo{}, nil).Once()
+		mockTodoService.On("UpdateTodo", modifiedTodo).Return(&entity.Todo{}, nil).Once()
+		u := NewTodoService(mockTodoService)
+		res, err := u.ModifyTodo(mockModifyTodo)
+
+		assert.Nil(t, err)
+		assert.NotNil(t, res)
+
+		mockTodoService.AssertExpectations(t)
+	})
+
+	t.Run("error-updateTodo", func(t *testing.T) {
+		FillAllStatDummy()
+
+		mockTodoService.On("SelectTodo", modifiedTodo).Return(&entity.Todo{}, nil).Once()
+		mockTodoService.On("UpdateTodo", modifiedTodo).Return(nil, errors.New("")).Once()
+		u := NewTodoService(mockTodoService)
+		res, err := u.ModifyTodo(mockModifyTodo)
+
+		assert.Nil(t, res)
+		assert.NotNil(t, err)
+
+		mockTodoService.AssertExpectations(t)
+	})
 }

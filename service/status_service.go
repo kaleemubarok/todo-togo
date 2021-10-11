@@ -16,8 +16,8 @@ type StatusService struct {
 	stat repository.IStatusRepo
 }
 
-func NewStatusService(repo *repository.IStatusRepo) IStatusService  {
-	return &StatusService{stat: *repo}
+func NewStatusService(repo repository.IStatusRepo) IStatusService  {
+	return &StatusService{stat: repo}
 }
 
 func (s *StatusService) PrepareAllStatus() {

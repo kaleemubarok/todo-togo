@@ -23,8 +23,8 @@ type todoService struct {
 	user   repository.IStatusRepo
 }
 
-func NewTodoService(repo *repository.ITodoRepo) ITodoService {
-	return todoService{todo: *repo}
+func NewTodoService(repo repository.ITodoRepo) ITodoService {
+	return todoService{todo: repo}
 }
 
 func (t todoService) AddTodo(todo model.CreateTodoRequest) (*model.CreateTodoResponse, error) {

@@ -49,3 +49,16 @@ func TestStatusService_PrepareAllStatus(t *testing.T) {
 	})
 
 }
+
+func FillAllStatDummy()  {
+	MapStatus = map[int]string{
+		1:"New",
+		2:"OnGoing",
+		3:"Done",
+		4:"Deleted",
+	}
+}
+
+func ResetAllStatDummy()  {
+	MapStatus = make(map[int]string,0)
+}

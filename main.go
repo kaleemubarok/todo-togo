@@ -1,15 +1,15 @@
 package main
 
 import (
-	"github.com/gofiber/fiber/v2"
 	"log"
 	"todo-togo/controller"
 	"todo-togo/db"
-	swagger "github.com/arsmn/fiber-swagger/v2"
 	_ "todo-togo/docs"
 	"todo-togo/repository"
 	"todo-togo/service"
 
+	swagger "github.com/arsmn/fiber-swagger/v2"
+	"github.com/gofiber/fiber/v2"
 )
 
 // @title TODO-TOGO a Todo API
@@ -24,11 +24,11 @@ func main() {
 	dbConn := db.NewSqliteConnection()
 
 	todoRepo := repository.NewTodoRepo(dbConn)
-	todoService := service.NewTodoService(&todoRepo)
+	todoService := service.NewTodoService(todoRepo)
 	todoController := controller.NewController(&todoService)
 
 	statusRepo := repository.NewStatusRepo(dbConn)
-	statusService := service.NewStatusService(&statusRepo)
+	statusService := service.NewStatusService(statusRepo)
 	statusService.PrepareAllStatus()
 
 	userRepo := repository.NewUserRepo(dbConn)
